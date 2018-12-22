@@ -3,23 +3,38 @@
     "rules": "database.rules.json"
   },
   "hosting": {
-    "public": "public",
+    "public": "build",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ],
     "rewrites": [
-      {
-        "source": "**",
+            {
+        "source": "/test",
+        "function":"app"
+      },
+            {
+        "source": "/Photos",
+        "function":"app",
         "destination": "/index.html"
+      },    {
+        "source": "/About",
+        "destination": "/index.html"
+        
+      },      {
+        "source": "/Estimates",
+        "destination": "/index.html"
+        
+      },      {
+        "source": "/Feedback",
+        "destination": "/index.html"
+        
+      },      {
+        "source": "/Services",
+        "destination": "/index.html"
+        
       }
     ]
-  },
-  "functions": {
-    "predeploy": [
-      "npm --prefix \"$RESOURCE_DIR\" run lint"
-    ],
-    "source": "functions"
   }
 }

@@ -11,8 +11,8 @@ class Comments extends Component {
 	componentDidMount() {}
 
   render() {
-        let comments = this.props.comment.feedback;
-    console.log(this.props.comment,"what's in the props??")
+        let comments = this.props.comment.comment;
+ //   console.log(this.props.comment,"what's in the props??")
     return (
       <div className="block-comment-content module text">
         <div className="comment-user">

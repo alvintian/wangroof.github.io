@@ -6,7 +6,7 @@ import {
   // Link,
   BrowserRouter as Router,
 } from 'react-router-dom';
-import $ from 'jquery';
+// import $ from 'jquery';
 import './App.css';
 import About from './About.jsx';
 import Services from './Services.jsx';
@@ -14,21 +14,19 @@ import Feedback from './Feedback.jsx';
 import Photos from './Photos.jsx';
 import Estimates from './Estimates.jsx';
 import RoofLogo from './images/your-roof.jpg';
+import {DB_CONFIG} from './Config/Firebase/db_config';
+import firebase from 'firebase/app';
+import 'firebase/database';
+import contactPic from './images/roof8.jpg';
+
 // import TwitterwarsHome from './images/twiterwarshome.png';
 
 const Home = () => (
   <div>
-{/*    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'center',
-        flexDirection: 'column',
-        alignItems: 'center',
-      }}>*/}
-                <img
+             <img
                   alt=""
                   src={RoofLogo}
-                  style={{ width: '324px', height: '182px', float: 'left', marginLeft: '20px' }}
+                  style={{ width: '500px', height: '220px', float: 'left', marginLeft: '20px' }}
                 />
       <h1 style={{ fontWeight: 'bold', lineHeight: '30px',textAlign: 'center', margin:'20px' }}>
         Wang Roofing
@@ -36,28 +34,6 @@ const Home = () => (
       <h3 style={{textAlign: 'center',margin: '20px' }}>
         call today and get your free estimates!
       </h3>
-{/*      <img
-        src={TwitterwarsHome}
-        width={'300px'}
-        style={{ marginTop: '20px' }}
-        alt=""
-      />*/}
- {/*     <h1 className="heading-font">Create Your Character!</h1>
-      <div className="create-char-button">
-        <Link
-          style={{ textDecoration: 'none', color: '#111111' }}
-          to="/NewChar">
-          Create Character
-        </Link>
-      </div>
-      <h1 className="heading-font">View Current Battles! </h1>
-      <div className="create-char-button">
-        <Link
-          style={{ textDecoration: 'none', color: '#111111' }}
-          to="/CurBattle">
-          View Battles!
-        </Link>
-      </div>*/}
   </div>
 );
 const Bottom = () => (
@@ -68,71 +44,52 @@ Address: 21 Mt.Rushmore, Toronto.ON.A2Q 4F5
 Business Hour: 24/7
 </div>
 );
+
+function HomePic() {
+  return (
+    <div>
+                  <img
+                      alt=""
+                      src={contactPic}
+                      style={{margin: '30px' }}
+                    />
+    </div>
+  );
+}
+
 class App extends Component {
   constructor() {
     super();
+
+if (!firebase.apps.length) {
+firebase.initializeApp(DB_CONFIG);
+}
+this.database = firebase.database().ref().child('picture');
+
     this.state = {
-      pictures: [],
-      matchState: {},
-    };
-        this.getData();
-        this.matchInfo = this.matchInfo.bind(this);
+      pictures: []
+          };
+//        this.getData();
+//        this.matchInfo = this.matchInfo.bind(this);
         // this.postBattletoDB = this.postBattletoDB.bind(this);
         // this.postChartoDB = this.postChartoDB.bind(this);
     // this.handleClickCard=this.handleClickCard.bind(this);
   }
+  componentWillMount(){
+const currentPicture = this.state.pictures;
 
-  matchInfo(match) {
-    this.setState({
-      matchState: match,
-    });
-  }
-  getData = () => {
-    $.get('/api/Photos', data => {
-      this.setState({
-        pictures: data,
+
+this.database.on('child_added', snap => {
+  currentPicture.push({
+  src: snap.val().src,
+  thumbnail: snap.val().thumbnail,
+  key:snap.key
+  })
+ this.setState({
+        pictures: currentPicture
       });
-    });
-  };
-  // postBattletoDB(team_Red, team_Blue) {
-  //   fetch('/api/Photos', {
-  //     method: 'post',
-  //     headers: {
-  //       Accept: 'application/json',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     //make sure to serialize your JSON body
-  //     body: JSON.stringify({
-  //       teamRed: team_Red,
-  //       teamBlue: team_Blue,
-  //     }),
-  //   });
-  // }
-  postChartoDB(charName, charAttr) {
-    // $.ajax({
-    //  url: '/api/NewChar',
-    //  method: 'POST',
-    //  data: {
-    //    character: charName,
-    //    select: charAttr,
-    //  },
-    //  success: console.log(charAttr, 'post success'),
-    // });
-    fetch('/api/Photos', {
-      method: 'post',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      //make sure to serialize your JSON body
-      body: JSON.stringify({
-        character: charName,
-        select: charAttr,
-      }),
-    }).then(response => {
-      //      this.getData();
-    });
-  }
+})
+}
 
   render() {
     return (
@@ -199,20 +156,16 @@ class App extends Component {
                 }
               </li>
             </nav>
+
+
             <Switch>
 {/*              <Route exact path="/" component={Home} />*/}
-              <Route exact path="/" />
+              <Route exact path="/"    component={HomePic}/>
               <Route exact path="/About" render={() => (<About/>)} />
               <Route exact path="/Services" render={() => (<Services/>)} />
               <Route exact path="/Feedback" render={() => (<Feedback/>)} />
               <Route exact path="/Estimates" render={() => (<Estimates/>)} />
-              <Route exact path="/Photos" render={() => (<Photos postChartoDB={this.postChartoDB} admin={this.state.pictures}/>)}/>
-                )}
-              />
-
-
-                )}
-              />
+              <Route exact path="/Photos" render={() => (<Photos admin={this.state.pictures}/>)}/>
             </Switch>
 <Bottom/>
 
